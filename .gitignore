@@ -1,0 +1,32 @@
+# sbt
+bin/
+project/
+target/
+build/
+.bsp
+
+# eclipse
+build
+.classpath
+.project
+.settings
+.worksheet
+
+# intellij idea
+*.log
+*.iml
+*.ipr
+*.iws
+.idea
+
+# other?
+.history
+.scala_dependencies
+.cache
+.cache-main
+usefullinf/
+curl
+websocat
+
+#general
+*.class
