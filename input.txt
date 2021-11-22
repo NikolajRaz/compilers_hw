@@ -1,0 +1,14 @@
+procedure TEditor.SetState(AState: Word; Enable: Boolean);
+Begin
+ inherited SetState(AState, Enable);
+ case AState of
+ sfActive: Begin
+ if HScrollBar <> nil then HScrollBar.SetState(sfVisible, Enable);
+ if VScrollBar <> nil then VScrollBar.SetState(sfVisible, Enable);
+ if Indicator <> nil then Indicator.SetState(sfVisible, Enable);
+ UpdateCommands;
+ End;
+ sfExposed:
+ if Enable then Unlock;
+ End;
+End;

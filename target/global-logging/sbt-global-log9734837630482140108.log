@@ -1,0 +1,11 @@
+[debug] > Exec(scala target/scala-2.13/lab1/untitled_2.13-0.1.jar < input.txt, None, None)
+[error] Expected ID character
+[error] Not a valid command: scala (similar: alias, last, eval)
+[error] Expected project ID
+[error] Expected configuration
+[error] Expected ':'
+[error] Expected key
+[error] Not a valid key: scala (similar: scalaHome, scalaSource, clean)
+[error] scala target/scala-2.13/lab1/untitled_2.13-0.1.jar < input.txt
+[error]      ^
+[debug] > Exec(idea-shell, None, None)
