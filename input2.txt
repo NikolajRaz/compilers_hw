@@ -1,1 +1,1 @@
-if TPoint(Info).Y <= T.Y R.Move(0, Desctop^.Size.Y - R.B.Y -2);
+if TPoint(Info).Y <= T.Y then R.Move(0, Desctop^.Size.Y - R.B.Y -2);

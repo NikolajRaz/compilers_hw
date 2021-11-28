@@ -1,29 +1,25 @@
 package lab2
 
-sealed abstract class ParseErrorMsg(place: String) {
+sealed trait ParseErrorMsg {
   def value: String
 }
 
-class ErrorInIfOperator(place: String) extends ParseErrorMsg(place) {
-  val value = s"Error during parsing if_operator on $place"
-}
+object ParseErrorMsg {
 
-class ErrorInExpOperator(place: String) extends ParseErrorMsg(place) {
-  val value = s"Error during parsing expression on $place"
-}
+  val if_token = "if"
+  val then_token = "then"
+  val comp_token = "<="
+  val id_token = "id"
+  val literal_token = "literal"
+  val left_brace_token = "("
+  val right_brace_token = ")"
+  val state_end_token = ";"
+  val point_token = "."
+  val comma_token = ","
+  val up_brace_token = "^"
+  val minus_token = "-"
 
-class ErrorInFuncOperator(place: String) extends ParseErrorMsg(place) {
-  val value = s"Error during parsing function on $place"
-}
-
-class ErrorInInnerValueOperator(place: String) extends ParseErrorMsg(place) {
-  val value = s"Error during parsing inner value on $place"
-}
-
-class ErrorInValueOperator(place: String) extends ParseErrorMsg(place) {
-  val value = s"Error during parsing value on $place"
-}
-
-class ErrorInCompOperator(place: String) extends ParseErrorMsg(place) {
-  val value = s"Error during parsing comparison operation on $place"
+  def apply(nonParsedToken: String, place: String, name: String): ParseErrorMsg = new ParseErrorMsg {
+    override def value: String = s"Error during parsing '$nonParsedToken' on '$place' while parsing $name"
+  }
 }

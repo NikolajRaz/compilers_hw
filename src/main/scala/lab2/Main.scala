@@ -24,7 +24,7 @@ object Main extends App {
 
   println{
     Analyzer(result) match {
-      case Right(value) => "OK"
+      case Right(_) => "OK"
       case Left(error) => error.value
     }
   }
