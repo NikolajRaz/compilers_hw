@@ -9,7 +9,7 @@ object Scanner {
         case letter if letter.isLetter                           =>
           fillLexemeChart(tail, accumulatedLexeme ++ List(letter))
         case literal if literal.isDigit                          =>
-          List(Right(Literal(literal.toString))) ++ fillLexemeChart(tail, List.empty)
+          checkLiteral(List(literal), tail)
         case delimiter if Grammar.delimiters.contains(delimiter) =>
           checkDelimiter(accumulatedLexeme, delimiter, tail)
         case Grammar.smaller                                     =>
@@ -32,6 +32,13 @@ object Scanner {
           case None                                                      =>
             List.empty
         }
+    }
+  }
+
+  private def checkLiteral(ac: List[Char], string: List[Char]): List[Either[ErrorMsg, Lexeme]] = {
+    string match {
+      case head :: tail if head.isDigit => checkLiteral(ac ++ List(head), tail)
+      case _ => List(Right(Literal(ac.mkString))) ++ fillLexemeChart(string)
     }
   }
 
