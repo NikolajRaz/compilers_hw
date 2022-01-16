@@ -29,6 +29,27 @@ sealed trait Procedure {
       else afterFunc(lexeme.drop(1), cache)
     }
 
+  def minusTetrads(lexemes: List[Lexeme], cache: TetradStorage, acc: String = ""): String = {
+    var inner_tetrad = Tetrad.empty.copy(
+      operation = minus_token,
+      operand1 = acc + getOperationName(lexemes.drop(1), lexemes.headOption.map(_.value).getOrElse(""), cache))
+    if (lexemes.drop(1).headOption.map(_.value).getOrElse("") == minus_token){
+      val result = minusTetrads(lexemes.drop(2), cache)
+      val tempNum = cache.numberOfTemporaryResults
+      inner_tetrad = inner_tetrad.copy(operand2 = result, result = Result(tempNum, ""))
+      if(!cache.ifExist(inner_tetrad)) {
+        cache.modifyTemp
+        cache.put(inner_tetrad)
+      }
+      s"T$tempNum"
+    }
+    else
+      if (lexemes.drop(1).headOption.map(_.value).getOrElse("") == point_token) {
+        minusTetrads(lexemes.drop(2), cache, acc + lexemes.headOption.map(_.value).getOrElse("") + ".")
+      }
+      else
+        acc + getOperationName(lexemes.drop(1), lexemes.headOption.map(_.value).getOrElse(""), cache)
+  }
 }
 
 case object Op_If extends Procedure {
@@ -72,13 +93,15 @@ case object Exp extends Procedure {
 
     def checkForLiteral(lexemes: List[Lexeme], cache: TetradStorage): Either[ParseErrorMsg, List[Lexeme]] = {
       lexemes.headOption match {
-        case Some(_: Literal) => Right(lexemes.tail)
+        case Some(_: Literal) =>
+          inner_tetrad = inner_tetrad.copy(operand1 = getOperationName(lexemes.drop(1), lexemes.headOption.map(_.value).getOrElse(""), cache))
+          checkForExp(lexemes.tail, cache)
         case _ => checkForVal(lexemes, cache)
       }
     }
 
     def checkForVal(lexemes: List[Lexeme], cache: TetradStorage): Either[ParseErrorMsg, List[Lexeme]] = {
-      Inner_Val(lexemes, cache).flatMap{value =>
+      Inner_Val(lexemes, cache).flatMap{ value =>
         inner_tetrad = inner_tetrad.copy(operand1 = getOperationName(lexemes.drop(1), lexemes.headOption.map(_.value).getOrElse(""), cache))
         checkForExp(value, cache)
       }
@@ -98,26 +121,6 @@ case object Exp extends Procedure {
           Exp(tail, cache)
         case _ => Right(lexemes)
       }
-    }
-
-    def minusTetrads(lexemes: List[Lexeme], cache: TetradStorage, acc: String = ""): String = {
-      var inner_tetrad = Tetrad.empty.copy(
-        operation = minus_token,
-        operand1 = acc + getOperationName(lexemes.drop(1), lexemes.headOption.map(_.value).getOrElse(""), cache))
-      if (lexemes.drop(1).headOption.map(_.value).getOrElse("") == minus_token){
-        val result = minusTetrads(lexemes.drop(2), cache)
-        val tempNum = cache.numberOfTemporaryResults
-        inner_tetrad = inner_tetrad.copy(operand2 = result, result = Result(tempNum, ""))
-        cache.modifyTemp
-        cache.put(inner_tetrad)
-        s"T$tempNum"
-      }
-      else
-        if (lexemes.drop(1).headOption.map(_.value).getOrElse("") == point_token) {
-           minusTetrads(lexemes.drop(2), cache, acc + lexemes.headOption.map(_.value).getOrElse("") + ".")
-      }
-        else
-          lexemes.headOption.map(_.value).getOrElse("")
     }
 
     Func(lexemes, cache) match {
@@ -237,9 +240,12 @@ case object Comp extends Procedure {
     Exp(lexemes, cache).flatMap {
       case head :: tail if head.value == comp_token =>
         inner_tetrad = inner_tetrad.copy(
-          operation = "-", operand1 = getOperationName(lexemes.drop(1), lexemes.headOption.map(_.value).getOrElse(""), cache),
-          operand2 = getOperationName(tail.drop(1), tail.headOption.map(_.value).getOrElse(""), cache),
+          operation = "-",
+          operand1 = minusTetrads(lexemes, cache),
+          operand2 = minusTetrads(tail, cache),
           result = Result(cache.numberOfTemporaryResults, ""))
+        if(inner_tetrad.operand1 == s"T${cache.numberOfTemporaryResults}")
+          inner_tetrad = inner_tetrad.copy(operand1 = s"T${cache.numberOfTemporaryResults-1}")
         cache.modifyTemp
         cache.put(inner_tetrad)
         Exp(tail, cache)

@@ -9,7 +9,7 @@ object Analyzer {
     cache.put(Tetrad("BLOCK", "", "", Result.empty))
     val res = Op_If(lexemes, cache)
     cache.put(Tetrad("BLCKEND", "", "", Result.empty))
-    cache.get.foreach(println(_))
+    res.map(_ => cache.get.foreach(println(_)))
     res
   }
 }

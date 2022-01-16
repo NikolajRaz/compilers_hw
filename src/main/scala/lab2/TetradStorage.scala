@@ -52,7 +52,9 @@ object TetradStorage {
     }
 
     override def ifExist(tetrad: Tetrad): Boolean =
-      tetrads.exists(curr => curr.operation == tetrad.operation && curr.operand1 == tetrad.operand1 && curr.operand2 == tetrad.operand2)
+      tetrads.exists(curr => curr.operation == tetrad.operation && curr.operand1 == tetrad.operand1 && curr.operand2 == tetrad.operand2) ||
+        tetrads.exists(curr => curr.operation == tetrad.operation && curr.operand1 == tetrad.operand1) ||
+        tetrads.exists(curr => curr.operation == tetrad.operation && curr.operand2 == tetrad.operand2)
 
     override def removeLast: Unit = tetrads = tetrads.dropRight(1)
 
